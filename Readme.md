@@ -6,6 +6,8 @@
 * **Backend:** NestJS (TypeScript)
 * **Frontend:** React.js (TypeScript)
 * **Database:** In-memory (custom singleton-based implementation)
+
+
 I implemeted in-memory database as it will allow other to gain insight into my raw javascript capabilities, otherwise i could implement the postgresql and pg/sequelize.
 
 ---
@@ -65,7 +67,7 @@ npm run dev
 
 ## Buy Now or Bucket Empty (Future improvements)
 
-In the actuall database, there we will have to add the quantity column to the menu items, so we will have to manage inventory when the item is added to bucket/cart, and when items is removed from the bucket/cart. and we will assume that as it is in education environment so we will consider that the items quantity changes rapidly and we will implement *Buy Now or Bucket Empty* policy so other student don't be left behind if some student is not processing the payment, also we will add the timer and background job to purge/empty the bucket/cart after some time like 15 minutes to implement "Buy NOw or Bucket Empty" policy
+In the actual database, there we will have to add the quantity column to the menu items and we will have to manage inventory when the item is added to bucket/cart, and when items is removed from the bucket/cart. and we will assume that as it is in education environment so we will consider that the items quantity changes rapidly and we will implement *Buy Now or Bucket Empty* policy so other students don't be left behind if some student is not processing the payment and also admin can manage inventory easily, also we will add the timer and background job to purge/empty the bucket/cart after some time like 15 minutes to implement "Buy NOw or Bucket Empty" policy
 
 ## 🗃️ Database ERD
 
