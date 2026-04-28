@@ -6,6 +6,7 @@
 * **Backend:** NestJS (TypeScript)
 * **Frontend:** React.js (TypeScript)
 * **Database:** In-memory (custom singleton-based implementation)
+I implemeted in-memory database as it will allow other to gain insight into my raw javascript capabilities, otherwise i could implement the postgresql and pg/sequelize.
 
 ---
 
