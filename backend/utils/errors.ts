@@ -41,6 +41,10 @@ export const ERRORS = {
         status: 404,
         message: "Ingredient not found",
     },
+    PAYMETN_NOT_UPDATED: {
+        status: 400,
+        message: "PAYMENT not updated",
+    },
     INVALID_PRICE: {
         status: 400,
         message: "Invalid price for menu item",
@@ -52,6 +56,10 @@ export const ERRORS = {
     PARENT_ACCOUNT_LOCKED: {
         status: 403,
         message: "Parent account is locked for transaction",
+    },
+    ITEM_NOT_FOUND: {
+        status: 400,
+        message: "item is not founds"
     },
     INVALID_QUANTITY: {
         status: 400,
