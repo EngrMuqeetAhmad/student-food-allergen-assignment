@@ -1,12 +1,16 @@
 import { MenuItemInterface } from "src/menu-item/domain/menuItem.interface";
 import { MenuItem } from "src/menu-item/domain/menuItem.model";
+import { MenuData } from "src/seed/menu.seed";
 import { AppException } from "utils/errorClass";
 
 export class InMemoryMenuItemRepository implements MenuItemInterface {
 
     private menuItems: MenuItem[] = [];
 
-    constructor() { }
+    constructor() {
+
+        this.menuItems = MenuData
+    }
 
     findAll(): MenuItem[] {
         return this.menuItems;

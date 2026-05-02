@@ -1,8 +1,8 @@
 export class Student {
     constructor(
         public id: number,
-        public name: string,
         public parentId: number,
-        public allergyIds: number[]
+        public userId: number, // FK to user table
+        public allergies: number[]
     ) { }
 }

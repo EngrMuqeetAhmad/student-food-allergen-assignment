@@ -9,6 +9,7 @@ import { InMemoryMenuItemRepository } from './infrastructure/in-memory/menuItem.
   providers: [MenuItemService, {
     provide: MENU_ITEM_REPOSITORY,
     useClass: InMemoryMenuItemRepository
-  }]
+  }],
+  exports: [MenuItemService]
 })
 export class MenuItemModule { }

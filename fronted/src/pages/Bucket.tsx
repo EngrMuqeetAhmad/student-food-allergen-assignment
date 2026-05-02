@@ -1,86 +1,60 @@
-
-import { useEffect, useState } from "react";
-import OrderService from "../service/order/order.service";
 import { toast } from "react-toastify";
-export default function Bucket({
-    studentId,
-}: {
-    studentId: number | null;
-}) {
-    const [items, setItems] = useState<any[]>([]);
+import { BucketList } from "../features/bucket/components/BucketList/BucketList";
+import { useCreateOrderMutation } from "../features/order/orderApi";
+import { useAppSelector } from "../store/hooks";
+import { useNavigate } from "react-router";
+import { routes } from "../routes/routes";
 
-    const fetchItems = async () => {
-        if (!studentId) return;
-        const data = await OrderService.listOrderItems(studentId);
-        setItems(data);
+export const BucketPage = () => {
+    console.log("bucket page");
+
+    const navigate = useNavigate();
+
+    const bucketId = useAppSelector(
+        (state) => state.bucket.bucketId
+    );
+
+    const studentId = useAppSelector(
+        (state) => state.bucket.studentId
+    );
+
+    const [createOrder, { isLoading }] =
+        useCreateOrderMutation();
+
+    const handlePlaceOrder = async () => {
+        if (!bucketId || !studentId) return;
+
+        try {
+            const res = await createOrder({
+                bucketId,
+                studentId,
+            }).unwrap();
+
+            console.log("Order created:", res);
+
+            navigate(routes.order);
+
+            toast.success("order created success, do the payment now")
+
+        } catch (err: any) {
+
+            toast.error(err.data.message)
+        }
     };
-
-    useEffect(() => {
-        fetchItems();
-    }, [studentId]);
-
-    const handleRemove = async (menuItemId: number) => {
-        if (!studentId) return;
-
-        await OrderService.removeItem({
-            menuItemId,
-            studentId,
-        });
-
-        setItems((prev) =>
-            prev.filter((item) => item.menuItemId !== menuItemId)
-        );
-    };
-
-    const handleComplete = async () => {
-        if (!studentId) return;
-
-        await OrderService.completeOrder({ studentId });
-        setItems([]);
-        toast.success("Order completed");
-    };
-
-    if (!studentId) {
-        return <p className="text-gray-500">Select a student first</p>;
-    }
 
     return (
-        <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Bucket</h2>
+        <div className="flex flex-col w-full gap-4 p-4">
 
-            {items.length === 0 && (
-                <p className="text-gray-500">No items</p>
-            )}
+            <BucketList />
 
-            {items.map((item) => (
-                <div
-                    key={item.menuItemId}
-                    className="flex justify-between items-center border p-3 rounded"
-                >
-                    <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-500">
-                            Qty: {item.quantity}
-                        </p>
-                    </div>
+            <button
+                onClick={handlePlaceOrder}
+                disabled={!bucketId || isLoading}
+                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition disabled:opacity-50"
+            >
+                {isLoading ? "Placing Order..." : "Place Order"}
+            </button>
 
-                    <button
-                        className="text-red-500"
-                        onClick={() => handleRemove(item.menuItemId)}
-                    >
-                        ✕
-                    </button>
-                </div>
-            ))}
-
-            {items.length > 0 && (
-                <button
-                    className="w-full py-2 bg-green-600 text-white rounded"
-                    onClick={handleComplete}
-                >
-                    Complete Order
-                </button>
-            )}
         </div>
     );
-}
+};

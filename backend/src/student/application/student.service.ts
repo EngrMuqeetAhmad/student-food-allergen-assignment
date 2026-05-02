@@ -14,8 +14,10 @@ export class StudentService {
         return this.studentRepository.getStudentById(id)
     }
 
-    findAllStudents() {
-        return this.studentRepository.getAllStudents()
+    findStudentByUserId(userId: number) {
+        return this.studentRepository.getStudentByUserId(userId)
+
     }
+
 
 }

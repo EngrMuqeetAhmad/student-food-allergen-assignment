@@ -1,22 +1,25 @@
-import { StudentType } from "src/DB/data.types";
+import { Student } from "src/student/domain/student.model";
 
-export const StudentsData: StudentType[] = [
+export const StudentsData: Student[] = [
     {
         id: 1,
-        name: "Alice",
         parentId: 1,
-        allergies: [1]
+        allergies: [1],
+        userId: 1
     },
     {
         id: 2,
-        name: "Bob",
         parentId: 1,
-        allergies: [2, 3]
+        allergies: [2, 3],
+        userId: 2
+
+
     },
     {
         id: 3,
-        name: "Charlie",
         parentId: 2,
-        allergies: [4]
+        allergies: [4],
+        userId: 3
+
     }
 ]

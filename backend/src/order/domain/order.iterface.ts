@@ -16,4 +16,6 @@ export interface OrderInterface {
 
     updateStatusOfOrder(orderId: number, status: STATUS): Order
 
+    setOrderTotalPrice(orderId: number, price: number): Order
+
 }

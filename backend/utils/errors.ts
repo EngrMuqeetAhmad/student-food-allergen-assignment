@@ -17,6 +17,14 @@ export const ERRORS = {
         status: 404,
         message: "User not found",
     },
+    PASSWORD_DONT_MATCH: {
+        status: 404,
+        message: "Credentials are wrong",
+    },
+    UNAUTHORIZED: {
+        status: 401,
+        message: "You are unauthorized to perform this operation"
+    },
     ORDER_NOT_FOUND: {
         status: 404,
         message: "Order not found",

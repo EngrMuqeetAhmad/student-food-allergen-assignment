@@ -1,19 +1,26 @@
 import { BucketInterface } from "src/bucket/domain/bucket.interface";
 import { Bucket, BucketItem } from "src/bucket/domain/bucket.model";
+import { BucketsData } from "src/seed/bucket.seed";
 import { AppException } from "utils/errorClass";
 
 export class InMemoryBucketRepository implements BucketInterface {
 
     private buckets: Bucket[] = []
     private bucketItems: BucketItem[] = []
-    constructor() { }
+    constructor() {
+        this.buckets = BucketsData
+    }
 
     getBucketById(id: number): Bucket | undefined {
         return this.buckets.find((bucket) => bucket.id == id)
     }
 
+    getBucketByStudentId(studentId: number): Bucket | undefined {
+        return this.buckets.find((bucket) => bucket.studentId == studentId)
+    }
+
     getBucketItemsByBucketId(bucketId: number): BucketItem[] {
-        return this.bucketItems.filter((item) => item.bucketId === bucketId)
+        return this.bucketItems.filter((item) => item.bucketId == bucketId)
     }
 
     addItem(menuItemId: number, itemPrice: number, quantity: number, bucketId: number): BucketItem {

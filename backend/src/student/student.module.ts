@@ -10,6 +10,7 @@ import { InMemoryStudentRepositry } from './infrastructure/in-memory/student.rep
     {
       provide: STUDENT_REPOSITORY,
       useClass: InMemoryStudentRepositry
-    }]
+    }],
+  exports: [StudentService]
 })
 export class StudentModule { }

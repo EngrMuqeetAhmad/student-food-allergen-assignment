@@ -1,6 +1,6 @@
-import { MenuItemType } from "src/DB/data.types";
+import { MenuItem } from "src/menu-item/domain/menuItem.model";
 
-export const MenuData: MenuItemType[] = [
+export const MenuData: MenuItem[] = [
     {
         id: 1,
         name: "Peanut Butter Sandwich",

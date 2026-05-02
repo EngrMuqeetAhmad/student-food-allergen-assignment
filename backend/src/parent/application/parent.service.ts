@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { PARENT_REPOSITORY } from 'src/common/tokens/token';
 import type { ParentInterface } from '../domain/parent.interface';
 import { AppException } from 'utils/errorClass';
@@ -16,12 +16,20 @@ export class ParentService {
     }
 
     updateParentBalance(amountDeduct: number, parentId: number) {
+        try {
+            if (amountDeduct <= 0) {
+                throw new AppException("INVALID_PRICE")
+            }
 
-        if (amountDeduct <= 0) {
-            throw new AppException("INVALID_PRICE")
+            const updatedParent = this.parentRepository.updateParentBalance(amountDeduct, parentId)
+            return updatedParent
+
+        } catch (error: any) {
+            throw new HttpException(error.message, error.status)
         }
 
-        return this.parentRepository.updateParentBalance(amountDeduct, parentId)
+
+
     }
 
 }

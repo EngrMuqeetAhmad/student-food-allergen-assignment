@@ -9,6 +9,7 @@ import { InMemoryParentRepository } from './infrastructure/in-memory/parent.repo
   providers: [ParentService, {
     provide: PARENT_REPOSITORY,
     useClass: InMemoryParentRepository
-  }]
+  }],
+  exports: [ParentService]
 })
 export class ParentModule { }

@@ -4,6 +4,9 @@ export interface BucketInterface {
 
     getBucketById(id: number): Bucket | undefined
 
+    getBucketByStudentId(studentId: number): Bucket | undefined
+
+
     addItem(menuItemId: number, itemPrice: number, quantity: number, bucketId: number): BucketItem
 
     removeItem(itemId: number): BucketItem

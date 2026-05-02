@@ -1,3 +1,4 @@
+import { HttpException } from "@nestjs/common";
 import { OrderInterface } from "src/order/domain/order.iterface";
 import { Order, OrderItem } from "src/order/domain/order.model";
 import { STATUS } from "src/utils/status.enum";
@@ -48,6 +49,32 @@ export class InMemoryOrderRepository implements OrderInterface {
         return newItem
     }
 
+    setOrderTotalPrice(orderId: number, price: number): Order {
+        try {
+            const order = this.getOrderById(orderId)
+            if (!order) {
+                throw new AppException("ORDER_NOT_FOUND")
+            }
+
+            order.totalPrice = price
+
+            this.orders = this.orders.map((order) => {
+                if (order.id == orderId) {
+                    return {
+                        ...order,
+                        totalPrice: price
+                    }
+                }
+                return order
+            })
+
+            return order
+
+
+        } catch (error: any) {
+            throw new HttpException(error.message, error.status)
+        }
+    }
 
     updateStatusOfOrder(orderId: number, status: STATUS): Order {
         const order = this.getOrderById(orderId)

@@ -42,15 +42,18 @@ export class OrderService {
             if (!order) {
                 throw new AppException("ORDER_NOT_CREATED")
             }
-
-            const bucketItems = this.bucketService.getBucketItemByBucketId(bucketId)
+            let totalPrice = 0
+            const bucketItems = this.bucketService.getBucketItemsByBucketId(bucketId)
             if (bucketItems.length <= 0) {
                 throw new AppException("BUCKET_EMPTY")
             }
 
             bucketItems.forEach((item) => {
-                this.addItemToOrder(item.menuItemId, item.quantity, order.id)
+                const addedItem = this.addItemToOrder(item.menuItemId, item.quantity, order.id)
+                totalPrice += addedItem.itemPrice * item.quantity
             })
+
+            this.orderRepository.setOrderTotalPrice(order.id, totalPrice)
 
             return order
         } catch (err: any) {

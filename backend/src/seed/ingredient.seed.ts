@@ -1,6 +1,6 @@
-import { IngredientType } from "src/DB/data.types";
+import { Ingredient } from "src/ingredient/domain/ingredient.model";
 
-export const IngredientsData: IngredientType[] = [
+export const IngredientsData: Ingredient[] = [
     {
         id: 1,
         name: "Peanuts"

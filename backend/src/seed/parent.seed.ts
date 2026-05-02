@@ -1,16 +1,14 @@
-import { ParentType } from "src/DB/data.types";
+import { Parent } from "src/parent/domain/parent.model";
 
-export const ParentsData: ParentType[] = [
+export const ParentsData: Parent[] = [
     {
         id: 1,
         balance: 20,
-        name: "John Doe",
-        lock: false
+        userId: 5
     },
     {
         id: 2,
         balance: 15,
-        name: "Jane Smith",
-        lock: false
+        userId: 4
     }
 ]

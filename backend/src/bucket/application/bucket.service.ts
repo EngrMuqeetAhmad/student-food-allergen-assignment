@@ -21,7 +21,28 @@ export class BucketService {
         return this.bucketRepository.getBucketById(id)
     }
 
-    getBucketItemByBucketId(bucketId: number) {
+    getMyBucket(userId: number) {
+
+        try {
+            const student = this.studentService.findStudentByUserId(userId)
+
+            if (!student) {
+                throw new AppException("USER_NOT_FOUND")
+            }
+
+            const bucket = this.bucketRepository.getBucketByStudentId(student.id)
+            if (!bucket) {
+                throw new AppException("BUCKET_NOT_FOUND")
+            }
+
+            return bucket
+
+        } catch (error: any) {
+            throw new HttpException(error.message, error.status)
+        }
+    }
+
+    getBucketItemsByBucketId(bucketId: number) {
         return this.bucketRepository.getBucketItemsByBucketId(bucketId)
     }
 
@@ -29,7 +50,7 @@ export class BucketService {
         return this.bucketRepository.getItemInBucketByItemId(itemId)
     }
 
-    allergiesOverlap(studentAllergies: number[], menuItemIngredients: number[]): number[] {
+    private allergiesOverlap(studentAllergies: number[], menuItemIngredients: number[]): number[] {
         const overlapIds: number[] = []
         const set = new Set(studentAllergies);
 
@@ -62,7 +83,7 @@ export class BucketService {
                 throw new AppException("USER_NOT_FOUND")
             }
             //
-            const allergensOverllap = this.allergiesOverlap(student.allergyIds, menuItem.ingredients)
+            const allergensOverllap = this.allergiesOverlap(student.allergies, menuItem.ingredients)
 
             if (allergensOverllap.length > 0) {
                 throw new AppException("ALLERGEN_PRESENT")
@@ -74,14 +95,14 @@ export class BucketService {
             }
             //
             const newAmount = menuItem.price * quantity;
-            const newTotalAmoutn = bucket.totalPrice = newAmount
+            const newTotalAmoutn = bucket.totalPrice + newAmount
 
             if (newTotalAmoutn > parent.balance) {
                 throw new AppException("INSUFFICIENT_BALANCE")
             }
 
             const newItem = this.bucketRepository.addItem(menuItem.id, menuItem.price, quantity, bucketId)
-
+            console.log("new item to bucket", newItem)
             const updatedBucket = this.bucketRepository.updateTotalPrice(newAmount, bucket.id)
             if (!updatedBucket) {
                 throw new AppException("PAYMETN_NOT_UPDATED")

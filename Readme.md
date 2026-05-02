@@ -67,38 +67,192 @@ npm run dev
 
 ---
 
-## 🏗️ Architecture & Design Approach
+## 🗃️ Database ERD
+
+![Database ERD](./erd.png)
+
+## 🧠 Architecture & Design Approach (Updated)
 
 The project follows a **Controller → Service → Repository** pattern with clear separation of concerns.
 
 ### Key Highlights:
 
-* Implemented **Repository Pattern** with interfaces and concrete implementations.
+* Implemented **Repository Pattern** with interfaces and concrete implementations
 * Enables easy swapping between:
 
   * In-memory database
   * Real database (PostgreSQL, Prisma, etc.)
-* No changes required in service/business logic when switching persistence layer.
+* No changes required in service/business logic when switching persistence layer
+* Followed **OOP principles and clean architecture practices**
 
 ---
 
-### 📂 Module Structure
+## 🧱 Design Principles
 
-Each feature/module is structured as:
+* Followed **Single Responsibility Principle (SRP)**
+* Applied **Open/Closed Principle (OCP)** (extend without modifying existing logic)
+* Used **Dependency Injection (NestJS built-in DI container)**
+* Strong encapsulation of domain logic
+* Modular and scalable architecture
+
+---
+
+## 🧠 Domain Model Design (Updated)
+
+### 1. User → Parent → Student Relationship
+
+* A **User can have multiple Parents and Students**
+* A **Parent entity owns wallet/balance**
+* A **Student belongs to one Parent**
+
+---
+
+### 2. One Student → One Bucket (STRICT RULE)
+
+* Each student has exactly **one active bucket**
+* Bucket is assigned at **student creation time**
+* Prevents multiple active carts per student
+* Ensures simplified state consistency
+
+---
+
+### 3. Order Lifecycle Design
+
+* Multiple orders per student are allowed (history preserved)
+* Only the **latest order is eligible for payment**
+* Older orders are:
+
+  * retained for history/audit purposes
+  * marked as dismissed logically
+
+---
+
+### 4. Payment & Wallet Strategy (Updated Explanation)
+
+* Payment is **NOT charged immediately**
+* Students can freely add multiple items to bucket
+* Final deduction happens at **checkout (complete order)**
+
+### Important Rule:
+
+* If payment fails:
+
+  * Order is **not marked as completed**
+  * Order remains in pending/invalid state
+
+---
+
+### 5. Concurrent Access Handling (IMPORTANT UPDATE)
+
+For real-world scenario:
+
+> Multiple students from the same parent may place orders at the same time
+
+### Solution Implemented:
+
+* A **locking mechanism on Parent account**
+
+```ts
+lockParentAccount(id: number)
+unLockParentAccount(id: number)
+```
+
+### Behavior:
+
+* Only one transaction per parent is allowed at a time
+* Prevents race conditions on wallet deduction
+* Ensures consistency in concurrent scenarios
+
+---
+
+### 6. In-Memory Database (Updated Explanation)
+
+* Implemented using **Singleton pattern**
+* Ensures single shared state across application
+* Used to:
+
+  * Focus on architecture design
+  * Avoid DB setup overhead
+  * Demonstrate system design skills
+
+---
+
+## 🔄 Transaction Considerations (Enhanced)
+
+### Current Implementation
+
+Since no real database is used:
+
+* Transaction behavior is **manually simulated**
+* Locking mechanism ensures controlled execution flow
+* Order creation + wallet deduction are logically coordinated
+
+---
+
+### Real Production Approach
+
+In production systems:
+
+* Use **ACID-compliant database transactions**
+* Ensure:
+
+  * Order creation
+  * Wallet deduction
+    happen in a **single atomic unit**
+
+If any step fails:
+
+* Entire operation is rolled back automatically
+
+---
+
+## 📦 Backend Folder Structure
 
 ```text
-feature/
-  domain/
-    model.ts
-    interface.ts
-  infrastructure/
-    in-memory/
-      feature.repository.ts
-  application/
-    feature.service.ts
-  presentation/
-    feature.controller.ts
+src/
+│
+├── auth/
+│   ├── application/
+│   ├── domain/
+│   ├── infrastructure/
+│   ├── presentation/
+│
+├── bucket/
+│   ├── application/
+│   ├── domain/
+│   ├── infrastructure/
+│   ├── presentation/
+│
+├── order/
+│   ├── application/
+│   ├── domain/
+│   ├── dto/
+│   ├── infrastructure/
+│   ├── presentation/
+│
+├── menu-item/
+│   ├── application/
+│   ├── domain/
+│   ├── infrastructure/
+│   ├── presentation/
+│
+├── ingredient/
+├── parent/
+├── student/
+│
+├── seed/
+│   ├── menu.seed.js
+│   ├── student.seed.js
+│   ├── parent.seed.js
+│
+├── common/
+├── decorators/
+├── guards/
+├── utils/
+└── main.ts
 ```
+
+---
 
 ### Explanation:
 
@@ -123,152 +277,31 @@ feature/
 
 ---
 
-### 🔌 Dependency Injection
 
-* Leveraged **NestJS built-in DI container**
-* Repository implementations are wired at module level
-* Uses tokens/interfaces for abstraction
+## 📌 Business Rules
 
-This ensures:
+### Bucket Policy
 
-* Loose coupling
-* Easy testing
-* Swappable implementations
+* Each student has only **one bucket**
+* Bucket is automatically created at registration
 
 ---
 
-### 🧱 Design Principles
+### Payment Rule
 
-* Followed **Single Responsibility Principle (SRP)**
-* Structured **REST APIs**
-* Clean separation between layers
-* Scalable and maintainable architecture
+* Only **latest order is payable**
+* Older orders are preserved for history only
 
 ---
 
-## 🎮 Controllers Implemented
+### Multi-Student Constraint
 
-Controllers are implemented for multiple features:
-
-* Ingredient
-* Menu Items
-* Orders
-* Bucket (Cart)
-* Parent
-* Student
-
-Also includes:
-
-* DTO validation
-* Structured API responses
+* Multiple students can belong to one parent
+* Parent wallet is shared across all children
+* Locking prevents concurrent deductions
 
 ---
 
-### Example Controllers
-
-```ts
-@Controller('ingredient')
-export class IngredientController {
-
-    constructor(private ingredientService: IngredientService) { }
-
-    @Get('all')
-    findAll() {
-        return this.ingredientService.findAll();
-    }
-
-    @Get(':id')
-    findById(@Param('id') id: number) {
-        return this.ingredientService.findById(id);
-    }
-}
-```
-
-```ts
-@Controller('menu-item')
-export class MenuItemController {
-
-    constructor(private menuItemService: MenuItemService) { }
-
-    @Get('all')
-    findAll() {
-        return this.menuItemService.findAll()
-    }
-
-    @Get(':id')
-    findById(@Param('id') id: number) {
-        return this.menuItemService.findById(id)
-    }
-}
-```
-
-```ts
-@Controller('order')
-export class OrderController {
-
-    constructor(
-        private orderService: OrderService
-    ) { }
-
-    @Get('/orders-by-student/:studentId')
-    getOrdersByStudent(@Param('studentId') studentId: number) {
-        return this.orderService.getAllOrdersByStudent(studentId)
-    }
-
-    @Get('/items-by-order/:orderId')
-    getItemsByOrderId(@Param('orderId') orderId: number) {
-        return this.orderService.getItemsByOrderId(orderId)
-    }
-
-    @Get('/:orderId')
-    getOrderById(@Param('orderId') orderId: number) {
-        return this.orderService.getOrderById(orderId)
-    }
-
-    @Post('/')
-    createOrder(@Body() body: { studentId: number, bucketId: number }) {
-        return this.orderService.createOrder(body.studentId, body.bucketId)
-    }
-
-    @Post('/complete')
-    completeOrder(@Body() body: { orderId: number, studentId: number }) {
-        return this.orderService.completeOrder(body.orderId, body.studentId)
-    }
-}
-```
-
-```ts
-@Controller('parent')
-export class ParentController {
-
-    constructor(private parentService: ParentService) { }
-
-    @Get(':id')
-    findParentById(@Param('id') id: number) {
-        return this.parentService.getParentById(id)
-    }
-}
-```
-
-```ts
-@Controller('student')
-export class StudentController {
-
-    constructor(private studentService: StudentService) { }
-
-    @Get('all')
-    findAll() {
-        return this.studentService.findAllStudents();
-    }
-
-    @Get(':id')
-    findStudentById(@Param('id') id: number) {
-        return this.studentService.findStudentById(id)
-    }
-}
-```
-
----
 
 ## Buy Now or Bucket Empty (Future improvements)
 
@@ -285,9 +318,7 @@ To handle high-demand scenarios:
 
 ---
 
-## 🗃️ Database ERD
 
-![Database ERD](./erd.png)
 
 ---
 
@@ -318,22 +349,18 @@ To handle high-demand scenarios:
 
 ---
 
-### 5. Architecture
 
-* Dependency Injection
-* Repository pattern
-* Clean layering
 
 ---
 
-### 6. Error Handling
+###  Error Handling
 
 * Centralized error handling
 * Custom error codes
 
 ---
 
-### 7. Authentication & Authorization (Planned)
+### Authentication & Authorization (Implemented)
 
 * JWT
 * RBAC
@@ -357,31 +384,24 @@ To handle high-demand scenarios:
 
 
 ---
+Here is your **clean, corrected, and complete API documentation** based on all the endpoints you shared across NestJS controllers (Order, Bucket, Menu, Auth, etc.).
 
-## API Endpoints
+---
 
-### Order
+# 📦 API Documentation
+
+---
+
+## 🔐 Auth
 
 ```
-POST   /order/                 → create order
-POST   /order/complete         → complete order
-GET    /order/:orderId         → get order by id
-GET    /order/orders-by-student/:studentId → get orders by student
-GET    /order/items-by-order/:orderId      → get items by order
+POST   /auth/login             → login user
+POST   /auth/register          → register user (if exists in system)
 ```
 
 ---
 
-### Ingredient
-
-```
-GET    /ingredient/all         → get all ingredients
-GET    /ingredient/:id         → get ingredient by id
-```
-
----
-
-### Menu Item
+## 🍔 Menu Item
 
 ```
 GET    /menu-item/all          → get all menu items
@@ -390,7 +410,33 @@ GET    /menu-item/:id          → get menu item by id
 
 ---
 
-### Student
+## 🧺 Bucket (Cart)
+
+```
+GET    /bucket/mine            → get current user's bucket
+GET    /bucket/:id             → get bucket by id
+GET    /bucket/items/:bucketId → get items in bucket
+
+POST   /bucket/addItem         → add item to bucket
+DELETE /bucket/Item            → remove item from bucket
+```
+
+---
+
+## 📦 Order
+
+```
+POST   /order/                              → create order (from bucket)
+POST   /order/complete                      → complete order
+
+GET    /order/:orderId                      → get order by id
+GET    /order/orders-by-student/:studentId → get all orders by student
+GET    /order/items-by-order/:orderId      → get items of a specific order
+```
+
+---
+
+## 👤 Student
 
 ```
 GET    /student/all            → get all students
@@ -399,7 +445,7 @@ GET    /student/:id            → get student by id
 
 ---
 
-### Parent
+## 👨‍👩‍👧 Parent
 
 ```
 GET    /parent/:id             → get parent by id
@@ -407,16 +453,17 @@ GET    /parent/:id             → get parent by id
 
 ---
 
-### Bucket (Cart)
+## 🥬 Ingredient
 
 ```
-POST   /order/add-item         → add item to bucket
-POST   /order/remove-item      → remove item from bucket
-GET    /order/list-items       → list bucket items
-POST   /order/complete-order   → complete order (checkout)
+GET    /ingredient/all         → get all ingredients
+GET    /ingredient/:id         → get ingredient by id
 ```
 
 ---
+
+
+
 
 ## Problem Scenario
 
@@ -462,8 +509,6 @@ POST   /order/complete-order   → complete order (checkout)
 
 * ChatGPT (documentation)
 * I used chat gpt for consulation and refining the design and architecture of code 
+* I used the AI to write some repetetive code
 
 ---
-
-If you want, I can next:
-👉 tighten the language to sound more “senior engineer / production-grade” (this is already good, but we can make it *exceptional for interviews*)

@@ -11,6 +11,7 @@ import { InMemortIngredientRepository } from './infrastructure/in-memory/ingredi
       provide: INGREDIENT_REPOSITORY,
       useClass: InMemortIngredientRepository
     }
-  ]
+  ],
+  exports: [IngredientService]
 })
 export class IngredientModule { }
