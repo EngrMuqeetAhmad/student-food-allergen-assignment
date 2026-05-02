@@ -1,5 +1,3 @@
-Here’s your updated README section with your additions **cleanly integrated** (nothing removed, just structured and enhanced):
-
 ---
 
 ## Tech Stack
@@ -57,6 +55,78 @@ cd frontend
 npm run dev
 ```
 
+## 🎯 Frontend Architecture (React + TypeScript)
+
+Frontend follows a **feature-based modular structure**:
+
+### Key Patterns:
+
+* Feature-first architecture
+* Redux Toolkit for state management
+* RTK Query for API handling
+* Component reusability
+* Separation of UI and business logic
+
+---
+
+## 📦 Frontend Folder Structure
+
+```text
+src/
+│
+├── api/
+├── assets/
+├── components/
+│   ├── button/
+│   ├── modal/
+│
+├── features/
+│   ├── auth/
+│   ├── bucket/
+│   ├── menu/
+│   ├── order/
+│
+├── pages/
+│   ├── Login.tsx
+│   ├── Menu/
+│   ├── Bucket.tsx
+│   ├── Order.tsx
+│
+├── routes/
+├── shared/
+│   ├── layout/
+│   ├── header/
+│   ├── sidebar/
+│
+├── store/
+├── hooks/
+├── utils/
+└── main.tsx
+```
+
+---
+
+## 🔄 Data Flow Summary
+
+```text
+UI (React)
+   ↓
+Redux / RTK Query
+   ↓
+API Layer
+   ↓
+NestJS Controller
+   ↓
+Service (Business Logic)
+   ↓
+Repository (In-Memory / DB)
+   ↓
+Domain Models
+```
+
+---
+
+
 ---
 
 ## Database Design
@@ -71,7 +141,7 @@ npm run dev
 
 ![Database ERD](./erd.png)
 
-## 🧠 Architecture & Design Approach (Updated)
+## 🧠 Architecture & Design Approach
 
 The project follows a **Controller → Service → Repository** pattern with clear separation of concerns.
 
@@ -177,7 +247,7 @@ unLockParentAccount(id: number)
 
 ---
 
-## 🔄 Transaction Considerations (Enhanced)
+## 🔄 Transaction Considerations
 
 ### Current Implementation
 
